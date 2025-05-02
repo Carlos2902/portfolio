@@ -1,0 +1,80 @@
+<svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink"
+    xmlns:svgjs="http://svgjs.dev/svgjs" width="2000" height="1247" viewBox="0 0 2000 1247">
+    <g transform="matrix(1,0,0,1,-1.2121212121212466,0.504858299595071)">
+        <svg viewBox="0 0 396 247" data-background-color="#ffffff"
+            preserveAspectRatio="xMidYMid meet" height="1247" width="2000"
+            xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+            <g id="tight-bounds" transform="matrix(1,0,0,1,0.2400000000000091,-0.09999999999999432)">
+                <svg viewBox="0 0 395.52 247.2" height="247.2" width="395.52">
+                    <g>
+                        <svg></svg>
+                    </g>
+                    <g>
+                        <svg viewBox="0 0 395.52 247.2" height="247.2" width="395.52">
+                            <g transform="matrix(1,0,0,1,133.50690352941177,47.215199999999996)">
+                                <svg viewBox="0 0 128.50619294117647 152.7696" height="152.7696"
+                                    width="128.50619294117647">
+                                    <g>
+                                        <svg viewBox="0 0 128.50619294117647 152.7696"
+                                            height="152.7696" width="128.50619294117647">
+                                            <g>
+                                                <svg viewBox="0 0 128.50619294117647 152.7696"
+                                                    height="152.7696" width="128.50619294117647">
+                                                    <g>
+                                                        <svg
+                                                            viewBox="0 0 128.50619294117647 152.7696"
+                                                            height="152.7696"
+                                                            width="128.50619294117647">
+                                                            <g id="textblocktransform">
+                                                                <svg
+                                                                    viewBox="0 0 128.50619294117647 152.7696"
+                                                                    height="152.7696"
+                                                                    width="128.50619294117647"
+                                                                    id="textblock">
+                                                                    <g>
+                                                                        <svg
+                                                                            viewBox="0 0 128.50619294117647 152.7696"
+                                                                            height="152.7696"
+                                                                            width="128.50619294117647">
+                                                                            <g
+                                                                                transform="matrix(1,0,0,1,0,0)">
+                                                                                <svg
+                                                                                    width="128.50619294117647"
+                                                                                    viewBox="3.4 -33.5 28.6 34"
+                                                                                    height="152.7696"
+                                                                                    data-palette-color="#3d9970">
+                                                                                    <path
+                                                                                        d="M28-9.95L32-8.45Q30.95-5.65 29-3.63 27.05-1.6 24.43-0.55 21.8 0.5 18.7 0.5L18.7 0.5Q14 0.5 10.58-1.58 7.15-3.65 5.28-7.45 3.4-11.25 3.4-16.5L3.4-16.5Q3.4-21.75 5.28-25.55 7.15-29.35 10.58-31.43 14-33.5 18.6-33.5L18.6-33.5Q21.8-33.5 24.3-32.63 26.8-31.75 28.58-30.03 30.35-28.3 31.4-25.8L31.4-25.8 27.45-23.95Q26.35-26.8 24.28-28.28 22.2-29.75 18.9-29.75L18.9-29.75Q15.55-29.75 13-28.18 10.45-26.6 9.03-23.65 7.6-20.7 7.6-16.5L7.6-16.5Q7.6-12.35 8.95-9.38 10.3-6.4 12.8-4.83 15.3-3.25 18.7-3.25L18.7-3.25Q22-3.25 24.45-4.93 26.9-6.6 28-9.95L28-9.95Z"
+                                                                                        opacity="1"
+                                                                                        transform="matrix(1,0,0,1,0,0)"
+                                                                                        fill="#3d9970"
+                                                                                        class="wordmark-text-0"
+                                                                                        data-fill-palette-color="primary"
+                                                                                        id="text-0"></path>
+                                                                                </svg>
+                                                                            </g>
+                                                                        </svg>
+                                                                    </g>
+                                                                </svg>
+                                                            </g>
+                                                        </svg>
+                                                    </g>
+                                                </svg>
+                                            </g>
+                                        </svg>
+                                    </g>
+                                </svg>
+                            </g>
+                            <path
+                                d="M315.808 41.215L315.808 0 68.608 0 68.608 247.2 315.808 247.2 315.808 205.985 302.031 205.985 302.031 233.423 82.385 233.423 82.385 13.777 302.031 13.777 302.031 41.215Z"
+                                fill="#096a2e" stroke="transparent"
+                                data-fill-palette-color="tertiary"></path>
+                        </svg>
+                    </g>
+                    <defs></defs>
+                </svg>
+                <rect width="395.52" height="247.2" fill="none" stroke="none" visibility="hidden"></rect>
+            </g>
+        </svg>
+    </g>
+</svg>
