@@ -69,12 +69,12 @@ const Testimonials = () => {
     <section id="testimonials" ref={section} data-theme="light" className="relative overflow-hidden">
       <div className={`page-x with-rail gap-y-6 ${pinned ? "min-h-[100svh] content-center py-24" : "py-24 lg:py-32"}`}>
         <div className="lg:pt-6">
-          <SectionLabel num="03">Kind words</SectionLabel>
+          <SectionLabel num="03">Testimonials</SectionLabel>
         </div>
 
         <div className="min-w-0">
           <h2 data-heading className="section-heading">
-            Kind <em className="accent-serif">words</em>
+            Testimonials
           </h2>
 
           <div className="mt-10 grid gap-5 lg:mt-14 lg:grid-cols-2 lg:gap-7">

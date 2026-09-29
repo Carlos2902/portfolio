@@ -1,7 +1,7 @@
 import { useRef, useState } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
-import { projects, projectsIntro } from "../content";
+import { projects } from "../content";
 import { fadeUpOnEnter, registerAnchor, scrollToY, splitLines, useMotion } from "../lib/motion";
 import { ArrowButton, SectionLabel, TextLink } from "./ui";
 
@@ -184,7 +184,7 @@ const Projects = () => {
             </ul>
           </div>
 
-          <div data-anim="controls" className="mt-6 flex flex-wrap items-center justify-between gap-x-10 gap-y-6 lg:mt-8 [@media(max-height:800px)]:mt-5">
+          <div data-anim="controls" className="mt-6 flex items-center lg:mt-8 [@media(max-height:800px)]:mt-5">
             <div className="flex items-center gap-5">
               <div className="flex gap-2">
                 <ArrowButton dir="prev" label="Previous project" disabled={index === 0} onClick={() => goTo.current?.(index - 1)} />
@@ -195,7 +195,6 @@ const Projects = () => {
                 <span className="font-serif italic text-muted"> / {pad(count)}</span>
               </p>
             </div>
-            <p className="max-w-[26rem] text-[0.95rem] leading-relaxed text-muted">{projectsIntro}</p>
           </div>
         </div>
       </div>

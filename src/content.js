@@ -6,9 +6,7 @@ export const links = {
 };
 
 export const hero = {
-  headline: "Hey, I’m",
-  name: "Carlos",
-  subtitle: "A full-stack engineer building applications with React, Python, Node.js and Google Cloud.",
+  statement: "A full-stack engineer building applications with React, Python, Node.js and Google Cloud.",
   body: "I specialize in crafting modern UI/UX experiences, backed by robust API design, payments, security, automated testing and performance optimization.",
 };
 
@@ -53,9 +51,6 @@ export const projects = [
     placeholder: { from: "#3F4A3C", to: "#9AA890", label: "Crecer", note: "Web" },
   },
 ];
-
-export const projectsIntro =
-  "A few products I’ve designed, built and shipped, from a marketplace app on both app stores to a nonprofit’s first online donations.";
 
 export const experience = [
   {

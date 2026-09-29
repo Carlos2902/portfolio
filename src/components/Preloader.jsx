@@ -2,19 +2,27 @@ import { useEffect, useRef, useState } from "react";
 import gsap from "gsap";
 import { useProgress } from "@react-three/drei";
 import { useMotion } from "../lib/motion";
+import outline from "../assets/logo-c-outline.png";
+import fill from "../assets/logo-c-fill.png";
 
-const MIN_DURATION = 1.6; // seconds; keeps the count readable even when everything is cached
+const MIN_DURATION = 1.6; // seconds; keeps the fill readable even when everything is cached
 const FAILSAFE = 12000; // ms; never trap visitors behind the loader
+// Loaders report per file, not per byte, so the fill also creeps up over time (easing toward 85%)
+// and only completes once everything has actually loaded.
+const creepAt = (seconds) => 85 * (1 - Math.exp(-seconds / 2.4));
 
-// 0–100% counter while the 3D logo and fonts load, then a curtain lifts off the page.
+// The logo drawn as an outline fills with white from the bottom while the 3D logo and fonts load,
+// then a curtain lifts off the page.
 const Preloader = ({ modelReady, onDone }) => {
   const { reduced } = useMotion();
   const { progress } = useProgress();
-  const [count, setCount] = useState(0);
+  const [level, setLevel] = useState(0);
   const [fontsReady, setFontsReady] = useState(false);
   const [forced, setForced] = useState(false);
+  const [creep, setCreep] = useState(0);
   const [gone, setGone] = useState(false);
   const root = useRef(null);
+  const logo = useRef(null);
   const counter = useRef({ value: 0 });
   const startedAt = useRef(performance.now());
   const exiting = useRef(false);
@@ -23,14 +31,16 @@ const Preloader = ({ modelReady, onDone }) => {
     let alive = true;
     (document.fonts?.ready ?? Promise.resolve()).then(() => alive && setFontsReady(true));
     const timer = setTimeout(() => setForced(true), FAILSAFE);
+    const ticker = setInterval(() => setCreep(creepAt((performance.now() - startedAt.current) / 1000)), 250);
     return () => {
       alive = false;
       clearTimeout(timer);
+      clearInterval(ticker);
     };
   }, []);
 
   const done = forced || (modelReady && fontsReady);
-  const target = done ? 100 : Math.min(progress, 100) * 0.9;
+  const target = done ? 100 : Math.max(creep, Math.min(progress, 100) * 0.9);
 
   useEffect(() => {
     const elapsed = (performance.now() - startedAt.current) / 1000;
@@ -38,7 +48,7 @@ const Preloader = ({ modelReady, onDone }) => {
       value: target,
       duration: done ? Math.max(0.6, MIN_DURATION - elapsed) : 0.8,
       ease: done ? "power2.inOut" : "power2.out",
-      onUpdate: () => setCount(Math.round(counter.current.value)),
+      onUpdate: () => setLevel(counter.current.value),
       onComplete: () => {
         if (!done || exiting.current) return;
         exiting.current = true;
@@ -50,8 +60,8 @@ const Preloader = ({ modelReady, onDone }) => {
         }
         gsap
           .timeline({ onComplete: () => setGone(true) })
-          .to(el.querySelectorAll("[data-preloader-fade]"), { yPercent: -120, autoAlpha: 0, duration: 0.6, ease: "power3.in", stagger: 0.05 })
-          .add(onDone, "-=0.1")
+          .to(logo.current, { scale: 1.08, autoAlpha: 0, duration: 0.7, ease: "power3.in", delay: 0.15 })
+          .add(onDone, "-=0.15")
           .to(el, { yPercent: -100, duration: 1.1, ease: "expo.inOut" }, "<");
       },
     });
@@ -63,29 +73,21 @@ const Preloader = ({ modelReady, onDone }) => {
   return (
     <div
       ref={root}
-      className="fixed inset-0 z-[100] flex flex-col justify-between bg-ink page-x py-8 text-paper"
+      className="fixed inset-0 z-[100] flex items-center justify-center bg-ink"
       role="progressbar"
       aria-label="Loading"
       aria-valuemin={0}
       aria-valuemax={100}
-      aria-valuenow={count}
+      aria-valuenow={Math.round(level)}
     >
-      <div className="flex items-center justify-between overflow-hidden">
-        <p data-preloader-fade className="eyebrow">Carlos Lopez</p>
-        <p data-preloader-fade className="eyebrow">Portfolio ©2026</p>
-      </div>
-
-      <div className="overflow-hidden">
-        <div data-preloader-fade className="flex items-end justify-between gap-6">
-          <p className="font-serif text-2xl italic text-white/60 sm:text-3xl">Loading the experience</p>
-          <p className="font-semibold leading-[0.8] tabular-nums tracking-[-0.05em] text-[clamp(5rem,18vw,15rem)]">
-            {count}
-            <span className="align-top text-[0.3em] tracking-normal text-white/50">%</span>
-          </p>
-        </div>
-        <div className="mt-6 h-px w-full bg-white/10">
-          <div className="h-full origin-left bg-paper" style={{ transform: `scaleX(${count / 100})` }} />
-        </div>
+      <div ref={logo} className="relative h-[clamp(140px,26vh,220px)] aspect-[355/456]">
+        <img src={outline} alt="" className="absolute inset-0 h-full w-full" />
+        <img
+          src={fill}
+          alt=""
+          className="absolute inset-0 h-full w-full"
+          style={{ clipPath: `inset(${100 - level}% 0 0 0)` }}
+        />
       </div>
     </div>
   );

@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas } from "@react-three/fiber";
+import { Canvas, useFrame } from "@react-three/fiber";
 import { Environment, Float, Lightformer, PresentationControls, useGLTF } from "@react-three/drei";
 import { ErrorBoundary } from "react-error-boundary";
 import * as THREE from "three";
@@ -7,10 +7,15 @@ import fallbackLogo from "../../assets/logo-c-white.png";
 
 const MODEL_URL = "/models/midnight-curl.glb";
 
-// The "sun": same direction as the CSS light rays (above, slightly in front), so the beams seem to hit the logo.
+// Key light from above and slightly in front, matching the soft wash at the top of the hero.
 const SUN = [0.8, 6, 3];
 
-// Black satin under a glossy clearcoat: soft body, mirror-like highlight where the sun hits.
+// Chroma on hover: thin-film iridescence fades in while the pointer is over the logo.
+const IRIDESCENCE = { rest: 0.15, hover: 1 };
+// On hover the glossy topcoat eases off so the iridescent layer underneath shows its colour.
+const CLEARCOAT = { rest: 1, hover: 0.25 };
+
+// Black satin under a glossy clearcoat: soft body, mirror-like highlights.
 const material = new THREE.MeshPhysicalMaterial({
   color: "#070707",
   roughness: 0.34,
@@ -20,11 +25,15 @@ const material = new THREE.MeshPhysicalMaterial({
   sheen: 0.35,
   sheenColor: new THREE.Color("#8a8a8a"),
   sheenRoughness: 0.5,
-  envMapIntensity: 1.25,
+  envMapIntensity: 1.1,
+  iridescence: IRIDESCENCE.rest,
+  iridescenceIOR: 1.6,
+  iridescenceThicknessRange: [260, 820],
 });
 
 function Logo({ onReady }) {
   const { scene } = useGLTF(MODEL_URL);
+  const hovered = useRef(false);
   const logo = useMemo(() => {
     const root = scene.clone(true);
     root.traverse((o) => {
@@ -37,8 +46,22 @@ function Logo({ onReady }) {
     onReady();
   }, [onReady]);
 
+  useFrame((_, dt) => {
+    const k = Math.min(1, dt * 4);
+    const on = hovered.current;
+    material.iridescence += ((on ? IRIDESCENCE.hover : IRIDESCENCE.rest) - material.iridescence) * k;
+    material.clearcoat += ((on ? CLEARCOAT.hover : CLEARCOAT.rest) - material.clearcoat) * k;
+  });
+
   // The model's letter reads correctly from behind, so turn it around.
-  return <primitive object={logo} rotation={[0, Math.PI, 0]} />;
+  return (
+    <primitive
+      object={logo}
+      rotation={[0, Math.PI, 0]}
+      onPointerOver={() => (hovered.current = true)}
+      onPointerOut={() => (hovered.current = false)}
+    />
+  );
 }
 
 const Fallback = ({ onReady }) => {
@@ -77,13 +100,14 @@ const LogoScene = ({ onReady, reduced }) => {
         >
           <Suspense fallback={null}>
             <Environment resolution={256} frames={1}>
-              <Lightformer form="rect" intensity={9} color="#fff3e2" position={SUN} rotation-x={Math.PI / 2} scale={[5, 2.5, 1]} />
-              <Lightformer form="rect" intensity={0.9} position={[-6, 1, 0]} rotation-y={Math.PI / 2} scale={[10, 3, 1]} />
-              <Lightformer form="rect" intensity={0.6} position={[6, -1, 1]} rotation-y={-Math.PI / 2} scale={[10, 2, 1]} />
-              <Lightformer form="ring" intensity={0.5} position={[0, -4, 4]} scale={3} />
+              <Lightformer form="rect" intensity={3.5} color="#fff3e2" position={SUN} rotation-x={Math.PI / 2} scale={[9, 4, 1]} />
+              <Lightformer form="rect" intensity={1.3} color="#f4f1ff" position={[-6, 1, 1]} rotation-y={Math.PI / 2} scale={[12, 5, 1]} />
+              <Lightformer form="rect" intensity={1.1} color="#fff4ea" position={[6, 0, 1]} rotation-y={-Math.PI / 2} scale={[12, 5, 1]} />
+              <Lightformer form="rect" intensity={0.6} position={[0, 0, 7]} scale={[10, 6, 1]} />
+              <Lightformer form="ring" intensity={0.4} position={[0, -4, 4]} scale={4} />
             </Environment>
-            <directionalLight position={SUN} intensity={2.4} color="#fff1df" />
-            <ambientLight intensity={0.08} />
+            <directionalLight position={SUN} intensity={1.3} color="#fff1df" />
+            <ambientLight intensity={0.22} />
 
             <PresentationControls
               global={false}

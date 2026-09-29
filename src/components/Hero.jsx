@@ -3,7 +3,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { hero } from "../content";
 import { splitLines, useMotion } from "../lib/motion";
-import LightRays from "./hero/LightRays";
+import ChromaFlow from "./hero/ChromaFlow";
 import LogoScene from "./hero/LogoScene";
 
 const Hero = ({ onModelReady }) => {
@@ -42,7 +42,11 @@ const Hero = ({ onModelReady }) => {
 
   return (
     <section id="top" ref={section} data-theme="dark" className="relative overflow-hidden">
-      <LightRays />
+      <div className="hero-wash" aria-hidden="true" />
+      {!reduced && <ChromaFlow area={section} active={ready} />}
+      <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
+        <div className="hero-grain" />
+      </div>
 
       <div
         data-hero-inner
@@ -52,20 +56,14 @@ const Hero = ({ onModelReady }) => {
           <LogoScene onReady={onModelReady} reduced={reduced} />
         </div>
 
-        <div className="max-w-[40rem] text-center lg:text-left">
+        <div className="relative max-w-[42rem] text-center lg:text-left">
           <h1
             data-hero-reveal
-            className="font-semibold leading-[0.92] tracking-[-0.045em] text-[clamp(3.25rem,8.4vw,8rem)]"
+            className="font-semibold leading-[1.02] tracking-[-0.04em] text-[clamp(2.3rem,4.3vw,4.4rem)] [text-wrap:balance]"
           >
-            {hero.headline} <em className="accent-serif">{hero.name}</em>
+            {hero.statement}
           </h1>
-          <p
-            data-hero-reveal
-            className="mx-auto mt-6 max-w-[32rem] font-serif text-[clamp(1.35rem,2.3vw,2rem)] italic leading-[1.2] text-white/85 lg:mx-0"
-          >
-            {hero.subtitle}
-          </p>
-          <p data-hero-reveal className="mx-auto mt-6 max-w-[28rem] text-[0.98rem] leading-relaxed text-white/55 lg:mx-0">
+          <p data-hero-reveal className="mx-auto mt-7 max-w-[30rem] text-[1.02rem] leading-relaxed text-white/60 lg:mx-0">
             {hero.body}
           </p>
         </div>
