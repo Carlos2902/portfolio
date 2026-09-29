@@ -1,53 +1,86 @@
-import { motion } from "framer-motion";
-import { styles } from "../styles";
-import { ComputersCanvas } from "./canvas";
+import { useRef } from "react";
+import gsap from "gsap";
+import { useGSAP } from "@gsap/react";
+import { hero } from "../content";
+import { splitLines, useMotion } from "../lib/motion";
+import LightRays from "./hero/LightRays";
+import LogoScene from "./hero/LogoScene";
 
-const Hero = () => {
+const Hero = ({ onModelReady }) => {
+  const { ready, reduced } = useMotion();
+  const section = useRef(null);
+
+  useGSAP(
+    () => {
+      const q = gsap.utils.selector(section);
+      if (reduced) return;
+      if (!ready) {
+        // Hidden until the preloader lifts, so nothing flashes underneath it.
+        gsap.set(q("[data-hero-reveal], [data-hero-logo], [data-hero-cue]"), { autoAlpha: 0 });
+        return;
+      }
+
+      // Staggered line reveal on load.
+      const lines = q("[data-hero-reveal]").flatMap((el) => splitLines(el).lines);
+      gsap
+        .timeline({ delay: 0.35 })
+        .set(q("[data-hero-reveal]"), { autoAlpha: 1 })
+        .fromTo(q("[data-hero-logo]"), { autoAlpha: 0, scale: 0.9, y: 30 }, { autoAlpha: 1, scale: 1, y: 0, duration: 1.8, ease: "expo.out" }, 0)
+        .from(lines, { yPercent: 110, duration: 1.2, ease: "power4.out", stagger: 0.09 }, 0.15)
+        .fromTo(q("[data-hero-cue]"), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.8 }, 0.9);
+
+      // Leaving the hero: push back and dim (like the Codrops frame).
+      gsap
+        .timeline({
+          defaults: { ease: "none" },
+          scrollTrigger: { trigger: section.current, start: "top top", end: "bottom top", scrub: true },
+        })
+        .to(q("[data-hero-inner]"), { yPercent: 18, scale: 0.95, filter: "brightness(35%)" });
+    },
+    { scope: section, dependencies: [ready, reduced] }
+  );
+
   return (
-    <section className={`relative w-full h-screen mx-auto`}>
-    <div
-      className={`absolute inset-0 top-[120px]  max-w-7xl mx-auto ${styles.paddingX} flex flex-row items-start gap-5`}
-    >
-      <div className='flex flex-col justify-center items-center mt-5'>
-        <div className='w-5 h-5 rounded-full bg-[#915EFF]' />
-        <div className='w-1 sm:h-80 h-40 violet-gradient' />
-      </div>
+    <section id="top" ref={section} data-theme="dark" className="relative overflow-hidden">
+      <LightRays />
 
-      <div>
-        <h1 className={`${styles.heroHeadText} text-white`}>
-          Hi, I'm <span className='text-[#045b26]'>Carlos</span>
-        </h1>
-        <p className={`${styles.heroSubText} mt-2 text-white-100`}>
-        I Develop Web Applications and   <br className='sm:block hidden' />
-        User Interfaces        </p>
-      </div>
-
-    </div>
-        <ComputersCanvas />
-        
-        <div className="absolute xs:bottom-10 bottom-32 
-        w-full flex justify-center items-center">
-          <a href="#about">
-            <div className="w-[35px] h-[64px] rounded-3xl border-4 
-            border-secondary flex justify-center items-start p-2"> 
-                    <motion.dev
-                      animate={{
-                        y: [0, 24, 0]
-                      }}
-                      transition={{
-                        duration:1.5,
-                        repeat: Infinity,
-                        repeatType: 'loop'
-                      }}
-                      className= "w-3 h-3 rounded-full bg-secondary mb-1"
-                    />
-            </div>
-          </a>
-
+      <div
+        data-hero-inner
+        className="page-x relative grid min-h-[100svh] grid-cols-1 content-center items-center gap-6 pb-16 pt-24 lg:grid-cols-2 lg:gap-10 lg:py-24"
+      >
+        <div data-hero-logo className="h-[42svh] min-h-[260px] lg:h-[74svh]">
+          <LogoScene onReady={onModelReady} reduced={reduced} />
         </div>
 
-      </section>
-  )
-}
+        <div className="max-w-[40rem] text-center lg:text-left">
+          <h1
+            data-hero-reveal
+            className="font-semibold leading-[0.92] tracking-[-0.045em] text-[clamp(3.25rem,8.4vw,8rem)]"
+          >
+            {hero.headline} <em className="accent-serif">{hero.name}</em>
+          </h1>
+          <p
+            data-hero-reveal
+            className="mx-auto mt-6 max-w-[32rem] font-serif text-[clamp(1.35rem,2.3vw,2rem)] italic leading-[1.2] text-white/85 lg:mx-0"
+          >
+            {hero.subtitle}
+          </p>
+          <p data-hero-reveal className="mx-auto mt-6 max-w-[28rem] text-[0.98rem] leading-relaxed text-white/55 lg:mx-0">
+            {hero.body}
+          </p>
+        </div>
+      </div>
 
-export default Hero
+      <div
+        data-hero-cue
+        className="pointer-events-none absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 sm:flex"
+        aria-hidden="true"
+      >
+        <span className="eyebrow">Scroll</span>
+        <span className="h-10 w-px bg-gradient-to-b from-white/60 to-transparent" />
+      </div>
+    </section>
+  );
+};
+
+export default Hero;

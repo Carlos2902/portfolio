@@ -1,32 +1,34 @@
-import { BrowserRouter } from "react-router-dom";
-
-import { About, Contact, Experience, Feedbacks, Hero, Navbar, Tech, Works, StarsCanvas } from "./components";
+import { useCallback, useState } from "react";
+import MotionProvider from "./components/MotionProvider";
+import Preloader from "./components/Preloader";
+import Navbar from "./components/Navbar";
+import Hero from "./components/Hero";
+import Projects from "./components/Projects";
+import Experience from "./components/Experience";
+import Testimonials from "./components/Testimonials";
+import Contact from "./components/Contact";
+import Footer from "./components/Footer";
 
 const App = () => {
+  const [modelReady, setModelReady] = useState(false);
+  const [ready, setReady] = useState(false);
+  const onModelReady = useCallback(() => setModelReady(true), []);
+  const onPreloaderDone = useCallback(() => setReady(true), []);
 
   return (
-    <BrowserRouter>
-      <div className='relative z-0 bg-primary'>
-
-        <div className='bg-hero-pattern bg-cover bg-no-repeat bg-center'>
-            <Navbar/>
-            <Hero/>
-        </div>
-
-        <About/>
-        <Experience/>
-        <Tech/>
-        <Works/>
-        <Feedbacks/>
-
-        <div className='relative z0'>
-          <Contact/>
-          <StarsCanvas/>
-        </div>
-
-      </div>
-    </BrowserRouter>
+    <MotionProvider ready={ready}>
+      <Preloader modelReady={modelReady} onDone={onPreloaderDone} />
+      <Navbar />
+      <main>
+        <Hero onModelReady={onModelReady} />
+        <Projects />
+        <Experience />
+        <Testimonials />
+        <Contact />
+      </main>
+      <Footer />
+    </MotionProvider>
   );
-}
+};
 
 export default App;

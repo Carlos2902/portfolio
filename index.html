@@ -2,11 +2,45 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/src/assets/logoC.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Carlos | Portfolio</title>
+    <title>Carlos Lopez | Full-Stack Engineer</title>
+    <meta
+      name="description"
+      content="Carlos Lopez is a full-stack engineer building applications with React, Python, Node.js and Google Cloud."
+    />
+    <meta name="theme-color" content="#0E0E0D" />
+    <meta property="og:title" content="Carlos Lopez | Full-Stack Engineer" />
+    <meta
+      property="og:description"
+      content="Full-stack engineer building applications with React, Python, Node.js and Google Cloud."
+    />
+    <meta property="og:url" content="https://carloslopezdev.com/" />
+    <meta property="og:type" content="website" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+
+    <link rel="preconnect" href="https://api.fontshare.com" crossorigin />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      rel="stylesheet"
+      href="https://api.fontshare.com/v2/css?f[]=general-sans@400,500,600,700&display=swap"
+    />
+    <link
+      rel="stylesheet"
+      href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;1,400;1,500&display=swap"
+    />
+    <link rel="preload" href="/models/midnight-curl.glb" as="fetch" crossorigin />
   </head>
   <body>
+    <!-- Static copy of the contact form so Netlify detects it at deploy. The live form is rendered by React. -->
+    <form name="contact" data-netlify="true" netlify-honeypot="bot-field" hidden>
+      <input type="text" name="name" />
+      <input type="email" name="email" />
+      <textarea name="message"></textarea>
+      <input name="bot-field" />
+    </form>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

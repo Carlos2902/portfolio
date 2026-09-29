@@ -12,6 +12,9 @@ module.exports = {
   settings: { react: { version: '18.2' } },
   plugins: ['react-refresh'],
   rules: {
+    'react/prop-types': 'off',
+    // React Three Fiber props and Netlify's form attribute.
+    'react/no-unknown-property': ['error', { ignore: ['object', 'rotation', 'position', 'intensity', 'netlify-honeypot'] }],
     'react-refresh/only-export-components': [
       'warn',
       { allowConstantExport: true },
