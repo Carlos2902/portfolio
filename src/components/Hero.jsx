@@ -88,23 +88,12 @@ const Hero = ({ onModelReady }) => {
             {hero.subline}
           </p>
 
-          <dl className="mt-9 grid grid-cols-1 gap-5 border-t border-white/10 pt-6 text-left xs:grid-cols-3 xs:gap-6">
-            {hero.proof.map(({ value, label }) => (
-              // Label first in the markup (dt before dd), value shown on top.
-              <div key={value} data-hero-fade className="flex flex-col-reverse">
-                <dt className="mt-1.5 text-[0.8rem] leading-snug text-white/60">{label}</dt>
-                <dd className="whitespace-nowrap text-[clamp(1.15rem,1.6vw,1.45rem)] font-semibold tracking-[-0.03em]">{value}</dd>
-              </div>
-            ))}
-          </dl>
-
           <div data-hero-fade className="mt-9 flex flex-wrap items-center justify-center gap-x-7 gap-y-4 lg:justify-start">
             <a
               href="#contact"
               onClick={go("contact")}
               className="pill-button border-paper bg-paper text-ink hover:bg-transparent hover:text-paper"
             >
-              <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
               Start a project
             </a>
             <a href="#projects" onClick={go("projects")} className="group relative py-1 text-[0.95rem] font-medium">

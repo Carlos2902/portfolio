@@ -8,15 +8,10 @@ export const links = {
 
 // Hero: lead with the outcome for the client, back it with proof, end with a clear next step.
 export const hero = {
-  eyebrow: "Full-stack developer · Toronto",
+  eyebrow: "Product designer & full-stack developer · Toronto",
   headline: "I take your app from idea to launch, and keep it running.",
   subline:
-    "Sole engineer behind LatinoLink, a marketplace live on the App Store and Google Play. Design, APIs, payments, security and deployment: one person, accountable for all of it.",
-  proof: [
-    { value: "100+", label: "users on a marketplace app I shipped solo" },
-    { value: "3.18s → 145ms", label: "API response time after my Django rework" },
-    { value: "81", label: "automated security tests guarding payments and data" },
-  ],
+    "I design every interface in Figma and Claude Design, then build the APIs, payments and security behind it and ship it to production. Designer and sole engineer behind LatinoLink, live on the App Store and Google Play.",
 };
 
 // `image`: a path in public/ (the card falls back to `placeholder` if it's null).
