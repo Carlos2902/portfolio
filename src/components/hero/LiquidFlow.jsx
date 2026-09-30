@@ -7,12 +7,12 @@ import { useEffect, useRef } from "react";
  * With no pointer (touch, idle), a slow autopilot keeps a faint ribbon moving.
  */
 
-const TRAIL = 24; // pointer history samples sent to the shader
+const TRAIL = 48; // pointer history samples sent to the shader
 const CONFIG = {
   renderScale: 0.55, // the liquid is smooth, so render below screen resolution and let CSS scale it
-  ambient: 0.045, // how much of the liquid shows with no pointer nearby
-  trailFade: 1.1, // per second
-  trailRadius: 0.07,
+  ambient: 0.03, // how much of the liquid shows with no pointer nearby
+  trailFade: 1.9, // per second
+  trailRadius: 0.0045, // a fine line of light rather than a wide spotlight
   idleAfter: 2200,
 };
 
@@ -46,16 +46,16 @@ float fbm(vec2 p) {
 }
 // Liquid height: noise warped by noise, drifting slowly; "push" bends it along the pointer's motion.
 float height(vec2 p, vec2 push) {
-  float t = uTime * 0.045;
+  float t = uTime * 0.022;
   vec2 q = vec2(fbm(p + vec2(0.0, t)), fbm(p + vec2(5.2, 1.3) - t));
   vec2 r = vec2(fbm(p + 1.4 * q + vec2(1.7, 9.2) + push), fbm(p + 1.4 * q + vec2(8.3, 2.8) + t * 0.7));
   return fbm(p + 1.6 * r);
 }
 // Studio "environment" reflected by the chrome: two soft light strips and a faint floor glow.
 float env(vec3 r) {
-  float strip = pow(max(0.0, 1.0 - abs(r.y - 0.38) * 2.2), 3.0);
-  float side = 0.5 * pow(max(0.0, 1.0 - abs(r.x + 0.45) * 2.4), 3.0);
-  float floorGlow = 0.1 * smoothstep(-0.2, -0.9, r.y);
+  float strip = pow(max(0.0, 1.0 - abs(r.y - 0.38) * 4.5), 6.0);
+  float side = 0.45 * pow(max(0.0, 1.0 - abs(r.x + 0.45) * 5.0), 6.0);
+  float floorGlow = 0.05 * smoothstep(-0.2, -0.9, r.y);
   return strip + side + floorGlow;
 }
 
@@ -71,8 +71,8 @@ void main() {
     glow += g;
     push += uTrail[i].zw * g;
   }
-  glow = clamp(glow, 0.0, 1.2);
-  push = clamp(push * 0.35, vec2(-0.6), vec2(0.6)); // gentle bend, no whirlpools
+  glow = clamp(glow, 0.0, 0.85);
+  push = clamp(push * 0.15, vec2(-0.3), vec2(0.3)); // a gentle bend, no whirlpools
 
   vec2 p = uv * vec2(aspect, 1.0) * 0.6;
   const float e = 0.003;
@@ -82,14 +82,14 @@ void main() {
 
   // Slightly different normals per channel: a chromatic split right on the highlights.
   vec3 view = vec3(0.0, 0.0, -1.0);
-  vec3 split = vec3(grad.y, -grad.x, 0.0) * 0.02;
+  vec3 split = vec3(grad.y, -grad.x, 0.0) * 0.014;
   float r = env(reflect(view, normalize(n + split)));
   float g = env(reflect(view, n));
   float b = env(reflect(view, normalize(n - split)));
   vec3 chrome = vec3(r, g, b) * vec3(1.0, 0.97, 0.93);
 
   // Fresnel-like rim on steep folds.
-  chrome += pow(1.0 - n.z, 2.0) * 0.35 * vec3(0.8, 0.86, 1.0);
+  chrome += pow(1.0 - n.z, 2.0) * 0.18 * vec3(0.8, 0.86, 1.0);
 
   float visible = uAmbient + glow;
   vec2 v = uv - 0.5;
@@ -230,17 +230,20 @@ const LiquidFlow = ({ area, active = true }) => {
       const fade = Math.exp(-dt * CONFIG.trailFade);
       for (let i = 0; i < TRAIL; i++) strength[i] *= fade;
 
-      if (pointer.pending && now - pointer.lastSample > 16) {
+      if (pointer.pending && now - pointer.lastSample > 12) {
         const { x, y, vx, vy } = pointer.pending;
         const speed = Math.min(1, Math.hypot(vx, vy) * 40);
-        push(x, y, vx * 60, vy * 60, 0.35 + speed * 0.65);
+        // Fill the gap from the previous sample so fast strokes stay one continuous line.
+        const steps = Math.min(4, Math.ceil(Math.hypot(vx, vy) / 0.012));
+        for (let i = steps - 1; i >= 1; i--) push(x - (vx * i) / steps, y - (vy * i) / steps, vx * 60, vy * 60, 0.3 + speed * 0.5);
+        push(x, y, vx * 60, vy * 60, 0.3 + speed * 0.5);
         pointer.pending = null;
         pointer.lastSample = now;
-      } else if (now - pointer.lastInput > CONFIG.idleAfter && now - pointer.lastSample > 90) {
+      } else if (now - pointer.lastInput > CONFIG.idleAfter && now - pointer.lastSample > 40) {
         const t = now / 1000;
-        const x = 0.5 + 0.34 * Math.sin(t * 0.21);
-        const y = 0.5 + 0.26 * Math.sin(t * 0.33 + 1.3);
-        push(x, y, (x - auto.x) * 60, (y - auto.y) * 60, 0.3);
+        const x = 0.5 + 0.34 * Math.sin(t * 0.14);
+        const y = 0.5 + 0.26 * Math.sin(t * 0.22 + 1.3);
+        push(x, y, (x - auto.x) * 60, (y - auto.y) * 60, 0.22);
         auto = { x, y };
         pointer.lastSample = now;
       }
