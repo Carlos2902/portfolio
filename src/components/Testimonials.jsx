@@ -34,9 +34,10 @@ const Testimonials = () => {
         scrollTrigger: {
           trigger: section.current,
           start: "top top",
-          end: () => `+=${window.innerHeight * 1.1}`,
+          end: () => `+=${window.innerHeight * 0.75}`,
           pin: true,
-          scrub: 0.6,
+          scrub: 0.35,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
           refreshPriority: 2,
         },

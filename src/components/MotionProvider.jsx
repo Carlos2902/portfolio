@@ -11,7 +11,7 @@ export default function MotionProvider({ ready, children }) {
   // Smooth scrolling (skipped under reduced motion), driven by GSAP's ticker so ScrollTrigger stays in sync.
   useEffect(() => {
     if (reduced) return;
-    const instance = new Lenis({ lerp: 0.12 });
+    const instance = new Lenis({ lerp: 0.1, wheelMultiplier: 1.05 });
     setLenis(instance);
     instance.on("scroll", ScrollTrigger.update);
     const tick = (time) => instance.raf(time * 1000);
@@ -35,7 +35,8 @@ export default function MotionProvider({ ready, children }) {
     if (!ready) return;
     ScrollTrigger.sort();
     ScrollTrigger.refresh();
-    document.fonts?.ready.then(() => ScrollTrigger.refresh());
+    // The preloader waits for fonts, so this only matters if its failsafe fired first.
+    if (document.fonts && document.fonts.status !== "loaded") document.fonts.ready.then(() => ScrollTrigger.refresh());
   }, [ready, pinned]);
 
   return <MotionContext.Provider value={{ ready, pinned, reduced }}>{children}</MotionContext.Provider>;

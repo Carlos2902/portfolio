@@ -99,7 +99,7 @@ const Projects = () => {
 
       // Pinned: the layout forms, then page scroll slides the cards sideways, all in one timeline.
       const overflow = () => Math.max(0, track.current.scrollWidth - viewport.current.clientWidth);
-      const unit = () => window.innerHeight * 1.1; // scroll distance for one timeline second
+      const unit = () => window.innerHeight * 0.8; // scroll distance for one timeline second
       const travel = overflow() / unit();
       const mid = (cards.length - 1) / 2;
 
@@ -110,7 +110,8 @@ const Projects = () => {
           start: "top top",
           end: () => `+=${tl.duration() * unit()}`,
           pin: true,
-          scrub: 0.6,
+          scrub: 0.35,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
           refreshPriority: 4,
           onUpdate: () => overflow() && setCurrent(stepOf(-gsap.getProperty(track.current, "x") / overflow())),

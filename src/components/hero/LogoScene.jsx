@@ -1,5 +1,5 @@
 import { Suspense, useEffect, useMemo, useRef, useState } from "react";
-import { Canvas, useFrame } from "@react-three/fiber";
+import { Canvas, useFrame, useThree } from "@react-three/fiber";
 import { Environment, Float, Lightformer, PresentationControls, useGLTF } from "@react-three/drei";
 import { ErrorBoundary } from "react-error-boundary";
 import * as THREE from "three";
@@ -76,9 +76,19 @@ function Logo({ onReady }) {
     return root;
   }, [scene]);
 
+  // Compile the materials in the background (KHR_parallel_shader_compile) before reporting ready,
+  // so the preloader lifts onto a smooth first frame instead of a shader-compile stall.
+  const gl = useThree((s) => s.gl);
+  const scene3d = useThree((s) => s.scene);
+  const camera = useThree((s) => s.camera);
   useEffect(() => {
-    onReady();
-  }, [onReady]);
+    let alive = true;
+    const compiled = gl.compileAsync ? gl.compileAsync(scene3d, camera) : Promise.resolve();
+    compiled.catch(() => {}).then(() => alive && onReady());
+    return () => {
+      alive = false;
+    };
+  }, [gl, scene3d, camera, onReady]);
 
   useFrame((_, dt) => {
     const k = Math.min(1, dt * 4);
@@ -124,7 +134,7 @@ const LogoScene = ({ onReady, reduced }) => {
     <div ref={wrapper} className="h-full w-full">
       <ErrorBoundary fallbackRender={() => <Fallback onReady={onReady} />}>
         <Canvas
-          dpr={[1, 2]}
+          dpr={[1, 1.5]}
           camera={{ position: [0, 0, 5.4], fov: 32 }}
           gl={{ antialias: true, alpha: true, toneMapping: THREE.ACESFilmicToneMapping }}
           frameloop={visible ? "always" : "never"}

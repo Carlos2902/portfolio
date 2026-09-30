@@ -5,6 +5,8 @@ import { SplitText } from "gsap/SplitText";
 import { useGSAP } from "@gsap/react";
 
 gsap.registerPlugin(ScrollTrigger, SplitText, useGSAP);
+// Mobile address-bar show/hide shouldn't trigger a full re-measure mid-scroll.
+ScrollTrigger.config({ ignoreMobileResize: true });
 
 // Handy for poking at scroll positions from the devtools console during development.
 if (import.meta.env.DEV) window.__ScrollTrigger = ScrollTrigger;
@@ -64,11 +66,11 @@ export function splitLines(el) {
 }
 
 // Simple on-enter reveal used when sections don't pin (phones, short screens).
-export function fadeUpOnEnter(targets, trigger, stagger = 0.08) {
+export function fadeUpOnEnter(targets, trigger, stagger = 0.05) {
   return gsap.from(targets, {
-    y: 36,
+    y: 24,
     autoAlpha: 0,
-    duration: 0.9,
+    duration: 0.6,
     ease: "power3.out",
     stagger,
     scrollTrigger: { trigger, start: "top 82%" },

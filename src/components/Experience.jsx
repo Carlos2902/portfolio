@@ -75,7 +75,7 @@ const Experience = () => {
       }
 
       const overflow = () => Math.max(0, track.current.scrollWidth - viewport.current.clientWidth);
-      const unit = () => window.innerHeight * 1.1;
+      const unit = () => window.innerHeight * 0.8;
       const travel = overflow() / unit();
 
       const tl = gsap.timeline({
@@ -85,7 +85,8 @@ const Experience = () => {
           start: "top top",
           end: () => `+=${tl.duration() * unit()}`,
           pin: true,
-          scrub: 0.6,
+          scrub: 0.35,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
           refreshPriority: 3,
         },

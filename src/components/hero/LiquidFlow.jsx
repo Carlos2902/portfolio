@@ -9,7 +9,8 @@ import { useEffect, useRef } from "react";
 
 const TRAIL = 48; // pointer history samples sent to the shader
 const CONFIG = {
-  renderScale: 0.55, // the liquid is smooth, so render below screen resolution and let CSS scale it
+  // The liquid is smooth, so it renders below screen resolution (CSS scales it up) within a pixel budget.
+  pixelBudget: { fine: 650_000, coarse: 300_000 },
   ambient: 0.03, // how much of the liquid shows with no pointer nearby
   trailFade: 1.9, // per second
   trailRadius: 0.0045, // a fine line of light rather than a wide spotlight
@@ -66,6 +67,7 @@ void main() {
   float glow = 0.0;
   vec2 push = vec2(0.0);
   for (int i = 0; i < ${TRAIL}; i++) {
+    if (uStrength[i] < 0.003) continue;
     vec2 d = (uv - uTrail[i].xy) * vec2(aspect, 1.0);
     float g = exp(-dot(d, d) / uRadius) * uStrength[i];
     glow += g;
@@ -95,28 +97,31 @@ void main() {
   vec2 v = uv - 0.5;
   float vignette = smoothstep(0.95, 0.25, length(v * vec2(aspect * 0.8, 1.0)));
   vec3 col = chrome * visible * mix(0.55, 1.0, vignette);
-  fragColor = vec4(1.0 - exp(-col * 1.25), 1.0);
+  // Light "screened" over the page's near-black (#0E0E0D), so no CSS blend mode is needed.
+  vec3 ink = vec3(0.0549, 0.0549, 0.051);
+  vec3 light = 1.0 - exp(-col * 1.25);
+  fragColor = vec4(ink + (1.0 - ink) * light, 1.0);
 }`;
 
 function createLiquid(canvas) {
   const gl = canvas.getContext("webgl2", { alpha: false, antialias: false, depth: false, stencil: false });
   if (!gl) return null;
-  const compile = (type, src) => {
+  // Compile in the background where supported (KHR_parallel_shader_compile): asking for the status
+  // right away would block the main thread until the GPU driver finishes.
+  const parallel = gl.getExtension("KHR_parallel_shader_compile");
+  const shader = (type, src) => {
     const s = gl.createShader(type);
     gl.shaderSource(s, src);
     gl.compileShader(s);
-    if (!gl.getShaderParameter(s, gl.COMPILE_STATUS)) throw new Error(gl.getShaderInfoLog(s));
     return s;
   };
-  const vs = compile(gl.VERTEX_SHADER, VERT);
-  const fs = compile(gl.FRAGMENT_SHADER, FRAG);
+  const vs = shader(gl.VERTEX_SHADER, VERT);
+  const fs = shader(gl.FRAGMENT_SHADER, FRAG);
   const program = gl.createProgram();
   gl.attachShader(program, vs);
   gl.attachShader(program, fs);
   gl.bindAttribLocation(program, 0, "aPosition");
   gl.linkProgram(program);
-  if (!gl.getProgramParameter(program, gl.LINK_STATUS)) throw new Error(gl.getProgramInfoLog(program));
-  gl.useProgram(program);
 
   const quad = gl.createBuffer();
   gl.bindBuffer(gl.ARRAY_BUFFER, quad);
@@ -124,10 +129,20 @@ function createLiquid(canvas) {
   gl.vertexAttribPointer(0, 2, gl.FLOAT, false, 0, 0);
   gl.enableVertexAttribArray(0);
 
-  const loc = (n) => gl.getUniformLocation(program, n);
-  const u = { res: loc("uRes"), time: loc("uTime"), ambient: loc("uAmbient"), radius: loc("uRadius"), trail: loc("uTrail"), strength: loc("uStrength") };
-
+  let u = null;
   return {
+    // True once the program is linked (without blocking); throws if compilation failed.
+    ready() {
+      if (u) return true;
+      if (parallel && !gl.getProgramParameter(program, parallel.COMPLETION_STATUS_KHR)) return false;
+      if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
+        throw new Error(gl.getShaderInfoLog(fs) || gl.getProgramInfoLog(program));
+      }
+      gl.useProgram(program);
+      const loc = (n) => gl.getUniformLocation(program, n);
+      u = { res: loc("uRes"), time: loc("uTime"), ambient: loc("uAmbient"), radius: loc("uRadius"), trail: loc("uTrail"), strength: loc("uStrength") };
+      return true;
+    },
     render(time, trail, strength) {
       gl.viewport(0, 0, gl.drawingBufferWidth, gl.drawingBufferHeight);
       gl.uniform2f(u.res, gl.drawingBufferWidth, gl.drawingBufferHeight);
@@ -157,10 +172,12 @@ const LiquidFlow = ({ area, active = true }) => {
   useEffect(() => {
     const canvas = canvasRef.current;
     const host = area.current;
+    const budget = window.matchMedia("(pointer: coarse)").matches ? CONFIG.pixelBudget.coarse : CONFIG.pixelBudget.fine;
     const sizeCanvas = () => {
-      const scale = Math.min(window.devicePixelRatio || 1, 2) * CONFIG.renderScale;
-      canvas.width = Math.max(1, Math.round(canvas.clientWidth * scale));
-      canvas.height = Math.max(1, Math.round(canvas.clientHeight * scale));
+      const w = canvas.clientWidth, h = canvas.clientHeight;
+      const scale = Math.min(window.devicePixelRatio || 1, Math.sqrt(budget / Math.max(1, w * h)));
+      canvas.width = Math.max(1, Math.round(w * scale));
+      canvas.height = Math.max(1, Math.round(h * scale));
     };
     sizeCanvas();
 
@@ -248,6 +265,14 @@ const LiquidFlow = ({ area, active = true }) => {
         pointer.lastSample = now;
       }
 
+      try {
+        if (!liquid.ready()) return;
+      } catch (e) {
+        console.warn("LiquidFlow disabled:", e);
+        canvas.style.visibility = "hidden";
+        cancelAnimationFrame(frame);
+        return;
+      }
       liquid.render((now - start) / 1000, trail, strength);
     };
     frame = requestAnimationFrame(loop);
@@ -263,7 +288,7 @@ const LiquidFlow = ({ area, active = true }) => {
     };
   }, [area]);
 
-  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full mix-blend-screen" aria-hidden="true" />;
+  return <canvas ref={canvasRef} className="absolute inset-0 h-full w-full" aria-hidden="true" />;
 };
 
 export default LiquidFlow;

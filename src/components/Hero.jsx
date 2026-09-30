@@ -1,10 +1,11 @@
-import { useRef } from "react";
+import { Suspense, lazy, useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { hero } from "../content";
 import { splitLines, useMotion } from "../lib/motion";
 import LiquidFlow from "./hero/LiquidFlow";
-import LogoScene from "./hero/LogoScene";
+// three.js and the 3D scene load as a separate chunk, in parallel with the preloader.
+const LogoScene = lazy(() => import("./hero/LogoScene"));
 
 const Hero = ({ onModelReady }) => {
   const { ready, reduced } = useMotion();
@@ -23,27 +24,29 @@ const Hero = ({ onModelReady }) => {
       // Staggered line reveal on load.
       const lines = q("[data-hero-reveal]").flatMap((el) => splitLines(el).lines);
       gsap
-        .timeline({ delay: 0.35 })
+        .timeline({ delay: 0.45 }) // lines rise as the preloader curtain uncovers the hero
         .set(q("[data-hero-reveal]"), { autoAlpha: 1 })
-        .fromTo(q("[data-hero-logo]"), { autoAlpha: 0, scale: 0.9, y: 30 }, { autoAlpha: 1, scale: 1, y: 0, duration: 1.8, ease: "expo.out" }, 0)
-        .from(lines, { yPercent: 110, duration: 1.2, ease: "power4.out", stagger: 0.09 }, 0.15)
-        .fromTo(q("[data-hero-cue]"), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.8 }, 0.9);
+        .fromTo(q("[data-hero-logo]"), { autoAlpha: 0, scale: 0.94, y: 20 }, { autoAlpha: 1, scale: 1, y: 0, duration: 1.1, ease: "expo.out" }, 0)
+        .from(lines, { yPercent: 110, duration: 0.8, ease: "power4.out", stagger: 0.055 }, 0.08)
+        .fromTo(q("[data-hero-cue]"), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 }, 0.5);
 
-      // Leaving the hero: push back and dim (like the Codrops frame).
+      // Leaving the hero: push back and dim (like the Codrops frame). Dimming is an overlay's opacity,
+      // not a CSS filter, so the WebGL layers underneath aren't re-rasterized every frame.
       gsap
         .timeline({
           defaults: { ease: "none" },
           scrollTrigger: { trigger: section.current, start: "top top", end: "bottom top", scrub: true },
         })
-        .to(q("[data-hero-inner]"), { yPercent: 18, scale: 0.95, filter: "brightness(35%)" });
+        .to(q("[data-hero-inner]"), { yPercent: 18, scale: 0.95, force3D: true })
+        .to(q("[data-hero-dim]"), { opacity: 0.65 }, 0);
     },
     { scope: section, dependencies: [ready, reduced] }
   );
 
   return (
     <section id="top" ref={section} data-theme="dark" className="relative overflow-hidden">
-      <div className="hero-wash" aria-hidden="true" />
       {!reduced && <LiquidFlow area={section} active={ready} />}
+      <div className="hero-wash" aria-hidden="true" />
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="hero-grain" />
       </div>
@@ -53,7 +56,9 @@ const Hero = ({ onModelReady }) => {
         className="page-x relative grid min-h-[100svh] grid-cols-1 content-center items-center gap-6 pb-16 pt-24 lg:grid-cols-2 lg:gap-10 lg:py-24"
       >
         <div data-hero-logo className="h-[42svh] min-h-[260px] lg:h-[74svh]">
-          <LogoScene onReady={onModelReady} reduced={reduced} />
+          <Suspense fallback={null}>
+            <LogoScene onReady={onModelReady} reduced={reduced} />
+          </Suspense>
         </div>
 
         <div className="relative isolate max-w-[42rem] text-center lg:text-left">
@@ -73,6 +78,8 @@ const Hero = ({ onModelReady }) => {
           </p>
         </div>
       </div>
+
+      <div data-hero-dim className="pointer-events-none absolute inset-0 bg-ink opacity-0" aria-hidden="true" />
 
       <div
         data-hero-cue

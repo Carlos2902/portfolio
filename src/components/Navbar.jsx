@@ -32,7 +32,7 @@ const Navbar = () => {
       frame = requestAnimationFrame(() => {
         if (!header.current) return;
         setTheme(sectionThemeUnder(header.current));
-        setScrolled(window.scrollY > window.innerHeight * 0.6);
+        setScrolled(window.scrollY > 60);
       });
     };
     update();

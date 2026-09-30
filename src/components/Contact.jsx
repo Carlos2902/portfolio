@@ -223,9 +223,10 @@ const Contact = () => {
         scrollTrigger: {
           trigger: section.current,
           start: "top top",
-          end: () => `+=${window.innerHeight * 0.9}`,
+          end: () => `+=${window.innerHeight * 0.6}`,
           pin: true,
-          scrub: 0.6,
+          scrub: 0.35,
+          anticipatePin: 1,
           invalidateOnRefresh: true,
           refreshPriority: 1,
         },
