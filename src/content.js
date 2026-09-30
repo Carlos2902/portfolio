@@ -6,9 +6,17 @@ export const links = {
   resume: "/Carlos-Lopez-Resume.pdf",
 };
 
+// Hero: lead with the outcome for the client, back it with proof, end with a clear next step.
 export const hero = {
-  headline: "I build full-stack mobile and web applications.",
-  subline: "Bring the idea. I design, demo, develop and deploy it, then keep it running.",
+  eyebrow: "Full-stack developer · Toronto",
+  headline: "I take your app from idea to launch, and keep it running.",
+  subline:
+    "Sole engineer behind LatinoLink, a marketplace live on the App Store and Google Play. Design, APIs, payments, security and deployment: one person, accountable for all of it.",
+  proof: [
+    { value: "100+", label: "users on a marketplace app I shipped solo" },
+    { value: "3.18s → 145ms", label: "API response time after my Django rework" },
+    { value: "81", label: "automated security tests guarding payments and data" },
+  ],
 };
 
 // `image`: a path in public/ (the card falls back to `placeholder` if it's null).

@@ -2,7 +2,7 @@ import { Suspense, lazy, useRef } from "react";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { hero } from "../content";
-import { splitLines, useMotion } from "../lib/motion";
+import { scrollToSection, splitLines, useMotion } from "../lib/motion";
 import LiquidFlow from "./hero/LiquidFlow";
 // three.js and the 3D scene load as a separate chunk, in parallel with the preloader.
 const LogoScene = lazy(() => import("./hero/LogoScene"));
@@ -10,6 +10,10 @@ const LogoScene = lazy(() => import("./hero/LogoScene"));
 const Hero = ({ onModelReady }) => {
   const { ready, reduced } = useMotion();
   const section = useRef(null);
+  const go = (id) => (e) => {
+    e.preventDefault();
+    scrollToSection(id);
+  };
 
   useGSAP(
     () => {
@@ -17,7 +21,7 @@ const Hero = ({ onModelReady }) => {
       if (reduced) return;
       if (!ready) {
         // Hidden until the preloader lifts, so nothing flashes underneath it.
-        gsap.set(q("[data-hero-reveal], [data-hero-logo], [data-hero-cue]"), { autoAlpha: 0 });
+        gsap.set(q("[data-hero-reveal], [data-hero-fade], [data-hero-logo], [data-hero-cue]"), { autoAlpha: 0 });
         return;
       }
 
@@ -28,6 +32,7 @@ const Hero = ({ onModelReady }) => {
         .set(q("[data-hero-reveal]"), { autoAlpha: 1 })
         .fromTo(q("[data-hero-logo]"), { autoAlpha: 0, scale: 0.94, y: 20 }, { autoAlpha: 1, scale: 1, y: 0, duration: 1.1, ease: "expo.out" }, 0)
         .from(lines, { yPercent: 110, duration: 0.8, ease: "power4.out", stagger: 0.055 }, 0.08)
+        .fromTo(q("[data-hero-fade]"), { autoAlpha: 0, y: 14 }, { autoAlpha: 1, y: 0, duration: 0.6, ease: "power3.out", stagger: 0.06 }, 0.35)
         .fromTo(q("[data-hero-cue]"), { autoAlpha: 0 }, { autoAlpha: 1, duration: 0.5 }, 0.5);
 
       // Leaving the hero: push back and dim (like the Codrops frame). Dimming is an overlay's opacity,
@@ -67,18 +72,46 @@ const Hero = ({ onModelReady }) => {
             className="pointer-events-none absolute -inset-x-16 -inset-y-20 -z-10 bg-[radial-gradient(closest-side,rgb(14_14_13/0.82),rgb(14_14_13/0.55)_55%,transparent)]"
             aria-hidden="true"
           />
+          <p data-hero-fade className="eyebrow mb-6">
+            {hero.eyebrow}
+          </p>
           <h1
             data-hero-reveal
-            className="font-semibold leading-[1] tracking-[-0.045em] text-[clamp(2.6rem,5vw,5.25rem)] [text-wrap:balance]"
+            className="font-semibold leading-[1.02] tracking-[-0.045em] text-[clamp(2.4rem,4.2vw,4.4rem)] [text-wrap:balance]"
           >
             {hero.headline}
           </h1>
           <p
             data-hero-reveal
-            className="mx-auto mt-7 max-w-[30rem] text-[clamp(1.08rem,1.45vw,1.3rem)] leading-[1.5] text-white/70 [text-wrap:balance] lg:mx-0"
+            className="mx-auto mt-6 max-w-[34rem] text-[clamp(1rem,1.2vw,1.12rem)] leading-[1.6] text-white/70 [text-wrap:pretty] lg:mx-0"
           >
             {hero.subline}
           </p>
+
+          <dl className="mt-9 grid grid-cols-1 gap-5 border-t border-white/10 pt-6 text-left xs:grid-cols-3 xs:gap-6">
+            {hero.proof.map(({ value, label }) => (
+              // Label first in the markup (dt before dd), value shown on top.
+              <div key={value} data-hero-fade className="flex flex-col-reverse">
+                <dt className="mt-1.5 text-[0.8rem] leading-snug text-white/60">{label}</dt>
+                <dd className="whitespace-nowrap text-[clamp(1.15rem,1.6vw,1.45rem)] font-semibold tracking-[-0.03em]">{value}</dd>
+              </div>
+            ))}
+          </dl>
+
+          <div data-hero-fade className="mt-9 flex flex-wrap items-center justify-center gap-x-7 gap-y-4 lg:justify-start">
+            <a
+              href="#contact"
+              onClick={go("contact")}
+              className="pill-button border-paper bg-paper text-ink hover:bg-transparent hover:text-paper"
+            >
+              <span className="h-1.5 w-1.5 rounded-full bg-current" aria-hidden="true" />
+              Start a project
+            </a>
+            <a href="#projects" onClick={go("projects")} className="group relative py-1 text-[0.95rem] font-medium">
+              See my work
+              <span className="absolute inset-x-0 bottom-0 h-px origin-left bg-current opacity-40 transition-opacity duration-300 group-hover:opacity-100" />
+            </a>
+          </div>
         </div>
       </div>
 
@@ -86,7 +119,7 @@ const Hero = ({ onModelReady }) => {
 
       <div
         data-hero-cue
-        className="pointer-events-none absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 sm:flex"
+        className="pointer-events-none absolute bottom-7 left-1/2 hidden -translate-x-1/2 flex-col items-center gap-3 sm:flex [@media(max-height:820px)]:!hidden"
         aria-hidden="true"
       >
         <span className="eyebrow">Scroll</span>
