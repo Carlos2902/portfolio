@@ -21,6 +21,11 @@ const Footer = () => (
 
       <ul className="flex gap-8 text-[0.92rem] text-white/70">
         <li>
+          <TextLink href={links.resume} className="hover:text-paper">
+            Resume
+          </TextLink>
+        </li>
+        <li>
           <TextLink href={links.github} className="hover:text-paper">
             GitHub
           </TextLink>

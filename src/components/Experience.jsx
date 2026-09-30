@@ -68,9 +68,19 @@ const Experience = () => {
       if (!ready || reduced) return;
       const q = gsap.utils.selector(section);
 
+      // Outlined numbers fill with white once the timeline reaches them.
+      const numbers = q("[data-number]");
+
       if (!pinned) {
         fadeUpOnEnter(q("[data-anim='label'], [data-heading]"), section.current);
-        q("[data-entry]").forEach((el) => fadeUpOnEnter(el, el));
+        q("[data-entry]").forEach((el, i) => {
+          fadeUpOnEnter(el, el);
+          gsap.to(numbers[i], {
+            color: "#fff",
+            duration: 0.35,
+            scrollTrigger: { trigger: el, start: "top 60%", toggleActions: "play none none reverse" },
+          });
+        });
         return;
       }
 
@@ -108,6 +118,14 @@ const Experience = () => {
           "formed"
         );
       }
+
+      // The fill line grows across the whole track, so it reaches entry i's dot at (dot offset / track width)
+      // of the way through the travel. With no travel (very wide screens), fill them one after another.
+      const width = track.current.scrollWidth;
+      q("[data-entry]").forEach((el, i) => {
+        const at = travel > 0 ? tl.labels.formed + (el.offsetLeft / width) * travel : tl.labels.formed + i * 0.08;
+        tl.fromTo(numbers[i], { color: "rgba(255,255,255,0)" }, { color: "#fff", duration: 0.08, ease: "none", immediateRender: false }, at);
+      });
       tl.to({}, { duration: 0.15 });
 
       return registerAnchor("work", () => tl.scrollTrigger.labelToScroll("formed"));

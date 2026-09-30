@@ -36,7 +36,14 @@ const ProjectCard = ({ project, pinned }) => (
   >
     <div className={`relative overflow-hidden rounded-2xl bg-[color:var(--chip)] ${pinned ? "h-full min-h-0" : "aspect-[4/3]"}`}>
       {project.image ? (
-        <img src={project.image} alt="" loading="lazy" className="absolute inset-0 h-full w-full object-cover" />
+        <img
+          src={project.image}
+          alt={`${project.name} ${project.kind.toLowerCase()} screenshot`}
+          loading="lazy"
+          decoding="async"
+          className="absolute inset-0 h-full w-full object-cover"
+          style={{ objectPosition: project.imagePosition ?? "50% 0%" }}
+        />
       ) : (
         <Placeholder {...project.placeholder} />
       )}

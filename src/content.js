@@ -3,15 +3,16 @@
 export const links = {
   github: "https://github.com/Carlos2902",
   linkedin: "https://www.linkedin.com/in/carloslopezdev",
+  resume: "/Carlos-Lopez-Resume.pdf",
 };
 
 export const hero = {
-  statement: "A full-stack engineer building applications with React, Python, Node.js and Google Cloud.",
-  body: "I specialize in crafting modern UI/UX experiences, backed by robust API design, payments, security, automated testing and performance optimization.",
+  headline: "I build full-stack mobile and web applications.",
+  subline: "Bring the idea. I design, demo, develop and deploy it, then keep it running.",
 };
 
-// `image`: add a path (e.g. "/projects/latinolink-app.webp" in public/) once the real images arrive.
-// Until then each card shows a placeholder built from `placeholder`.
+// `image`: a path in public/ (the card falls back to `placeholder` if it's null).
+// `imagePosition`: which part of the screenshot stays in view when the card crops it.
 export const projects = [
   {
     name: "LatinoLink",
@@ -28,16 +29,18 @@ export const projects = [
       { label: "Case study", href: "/latinolink" },
       { label: "Case study (ES)", href: "/latinolink/es", hrefLang: "es" },
     ],
-    image: null,
+    image: "/projects/latinolink-app.webp",
+    imagePosition: "50% 70%",
     placeholder: { from: "#1E2A78", to: "#5B6CF0", label: "LatinoLink", note: "App" },
   },
   {
     name: "LatinoLink",
     kind: "Website",
     description: "Website for the LatinoLink app.",
-    tech: ["Figma", "JavaScript", "CSS"],
+    tech: ["Figma", "HTML5", "JavaScript", "CSS"],
     links: [{ label: "Live site", href: "https://latinolinkapp.ca/" }],
-    image: null,
+    image: "/projects/latinolink-website.webp",
+    imagePosition: "50% 0%",
     placeholder: { from: "#C2410C", to: "#FB923C", label: "LatinoLink", note: "Web" },
   },
   {
@@ -46,8 +49,15 @@ export const projects = [
     description:
       "Proposed, designed and built a responsive full-stack web app to replace the organization’s outdated static site, including its first secure online donation system (Stripe webhooks).",
     tech: ["Django REST Framework", "JavaScript", "Stripe", "Google Maps API", "CSS animations", "Figma"],
-    links: [{ label: "Live site", href: "https://crecermexico.org/" }],
-    image: null,
+    links: [
+      { label: "Live site", href: "https://crecermexico.org/" },
+      {
+        label: "Case study",
+        href: "https://medium.com/@carloslopezr29/from-broken-buttons-to-a-full-stack-application-a-deep-dive-into-rebuilding-a-nonprofits-digital-892b9f2fdb3a",
+      },
+    ],
+    image: "/projects/crecer-mexico.webp",
+    imagePosition: "50% 0%",
     placeholder: { from: "#3F4A3C", to: "#9AA890", label: "Crecer", note: "Web" },
   },
 ];

@@ -98,6 +98,18 @@ const Navbar = () => {
               </a>
             </li>
           ))}
+          <li>
+            <a
+              href={links.resume}
+              target="_blank"
+              rel="noreferrer"
+              className="group relative py-2 text-[0.95rem] font-medium tracking-[-0.01em]"
+            >
+              Resume
+              <span className="sr-only"> (PDF, opens in a new tab)</span>
+              <span className="absolute inset-x-0 bottom-0.5 h-px origin-right scale-x-0 bg-current transition-transform duration-500 ease-out group-hover:origin-left group-hover:scale-x-100" />
+            </a>
+          </li>
         </ul>
 
         <a
@@ -154,6 +166,9 @@ const Navbar = () => {
           ))}
         </ul>
         <div className="flex gap-6 text-sm text-white/60">
+          <a href={links.resume} target="_blank" rel="noreferrer" tabIndex={open ? 0 : -1} className="hover:text-paper">
+            Resume
+          </a>
           <a href={links.github} target="_blank" rel="noreferrer" tabIndex={open ? 0 : -1} className="hover:text-paper">
             GitHub
           </a>

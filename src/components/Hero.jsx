@@ -69,12 +69,15 @@ const Hero = ({ onModelReady }) => {
           />
           <h1
             data-hero-reveal
-            className="font-semibold leading-[1.02] tracking-[-0.04em] text-[clamp(2.3rem,4.3vw,4.4rem)] [text-wrap:balance]"
+            className="font-semibold leading-[1] tracking-[-0.045em] text-[clamp(2.6rem,5vw,5.25rem)] [text-wrap:balance]"
           >
-            {hero.statement}
+            {hero.headline}
           </h1>
-          <p data-hero-reveal className="mx-auto mt-7 max-w-[30rem] text-[1.02rem] leading-relaxed text-white/60 lg:mx-0">
-            {hero.body}
+          <p
+            data-hero-reveal
+            className="mx-auto mt-7 max-w-[30rem] text-[clamp(1.08rem,1.45vw,1.3rem)] leading-[1.5] text-white/70 [text-wrap:balance] lg:mx-0"
+          >
+            {hero.subline}
           </p>
         </div>
       </div>
