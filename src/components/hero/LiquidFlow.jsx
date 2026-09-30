@@ -10,7 +10,7 @@ import { useEffect, useRef } from "react";
 const TRAIL = 48; // pointer history samples sent to the shader
 const CONFIG = {
   // The liquid is smooth, so it renders below screen resolution (CSS scales it up) within a pixel budget.
-  pixelBudget: { fine: 650_000, coarse: 300_000 },
+  pixelBudget: { fine: 480_000, coarse: 260_000 },
   ambient: 0.03, // how much of the liquid shows with no pointer nearby
   trailFade: 1.9, // per second
   trailRadius: 0.0045, // a fine line of light rather than a wide spotlight
@@ -77,9 +77,9 @@ void main() {
   push = clamp(push * 0.15, vec2(-0.3), vec2(0.3)); // a gentle bend, no whirlpools
 
   vec2 p = uv * vec2(aspect, 1.0) * 0.6;
-  const float e = 0.003;
+  // Slope from the GPU's neighbouring-pixel differences: one height evaluation per pixel instead of three.
   float h = height(p, push);
-  vec2 grad = vec2(height(p + vec2(e, 0.0), push) - h, height(p + vec2(0.0, e), push) - h) / e;
+  vec2 grad = vec2(dFdx(h), dFdy(h)) / vec2(length(dFdx(p)), length(dFdy(p)));
   vec3 n = normalize(vec3(-grad * 0.3, 1.0));
 
   // Slightly different normals per channel: a chromatic split right on the highlights.
