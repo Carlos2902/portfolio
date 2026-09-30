@@ -3,7 +3,7 @@ import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { hero } from "../content";
 import { splitLines, useMotion } from "../lib/motion";
-import ChromaFlow from "./hero/ChromaFlow";
+import LiquidFlow from "./hero/LiquidFlow";
 import LogoScene from "./hero/LogoScene";
 
 const Hero = ({ onModelReady }) => {
@@ -43,7 +43,7 @@ const Hero = ({ onModelReady }) => {
   return (
     <section id="top" ref={section} data-theme="dark" className="relative overflow-hidden">
       <div className="hero-wash" aria-hidden="true" />
-      {!reduced && <ChromaFlow area={section} active={ready} />}
+      {!reduced && <LiquidFlow area={section} active={ready} />}
       <div className="pointer-events-none absolute inset-0 overflow-hidden" aria-hidden="true">
         <div className="hero-grain" />
       </div>
@@ -56,7 +56,12 @@ const Hero = ({ onModelReady }) => {
           <LogoScene onReady={onModelReady} reduced={reduced} />
         </div>
 
-        <div className="relative max-w-[42rem] text-center lg:text-left">
+        <div className="relative isolate max-w-[42rem] text-center lg:text-left">
+          {/* Soft dark halo so the copy stays legible when the liquid lights up behind it. */}
+          <div
+            className="pointer-events-none absolute -inset-x-16 -inset-y-20 -z-10 bg-[radial-gradient(closest-side,rgb(14_14_13/0.82),rgb(14_14_13/0.55)_55%,transparent)]"
+            aria-hidden="true"
+          />
           <h1
             data-hero-reveal
             className="font-semibold leading-[1.02] tracking-[-0.04em] text-[clamp(2.3rem,4.3vw,4.4rem)] [text-wrap:balance]"

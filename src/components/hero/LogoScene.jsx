@@ -15,21 +15,55 @@ const IRIDESCENCE = { rest: 0.15, hover: 1 };
 // On hover the glossy topcoat eases off so the iridescent layer underneath shows its colour.
 const CLEARCOAT = { rest: 1, hover: 0.25 };
 
-// Black satin under a glossy clearcoat: soft body, mirror-like highlights.
+// Polished ebony, like a chess piece: dark wood grain under a glossy lacquer (clearcoat).
 const material = new THREE.MeshPhysicalMaterial({
-  color: "#070707",
-  roughness: 0.34,
+  color: "#0a0706",
+  roughness: 0.32,
   metalness: 0,
   clearcoat: 1,
-  clearcoatRoughness: 0.05,
-  sheen: 0.35,
-  sheenColor: new THREE.Color("#8a8a8a"),
-  sheenRoughness: 0.5,
+  clearcoatRoughness: 0.06,
   envMapIntensity: 1.1,
   iridescence: IRIDESCENCE.rest,
   iridescenceIOR: 1.6,
   iridescenceThicknessRange: [260, 820],
 });
+
+// The model has no UVs, so the grain is procedural and 3D (object space): it wraps every curve seamlessly.
+const EBONY_GLSL = /* glsl */ `
+varying vec3 vObjPos;
+float ebHash(vec3 p) { p = fract(p * 0.3183099 + 0.1); p *= 17.0; return fract(p.x * p.y * p.z * (p.x + p.y + p.z)); }
+float ebNoise(vec3 x) {
+  vec3 i = floor(x), f = fract(x);
+  f = f * f * (3.0 - 2.0 * f);
+  return mix(mix(mix(ebHash(i), ebHash(i + vec3(1, 0, 0)), f.x), mix(ebHash(i + vec3(0, 1, 0)), ebHash(i + vec3(1, 1, 0)), f.x), f.y),
+             mix(mix(ebHash(i + vec3(0, 0, 1)), ebHash(i + vec3(1, 0, 1)), f.x), mix(ebHash(i + vec3(0, 1, 1)), ebHash(i + vec3(1, 1, 1)), f.x), f.y), f.z);
+}
+float ebFbm(vec3 p) { float f = 0.0, a = 0.5; for (int i = 0; i < 4; i++) { f += a * ebNoise(p); p *= 2.03; a *= 0.5; } return f; }
+// Grain runs along the piece's height, like wood turned on a lathe; an off-centre ring gives long curved streaks.
+float ebonyGrain(vec3 p) {
+  float warp = ebFbm(p * vec3(2.2, 0.45, 2.2)) * 7.5 + ebFbm(p * vec3(9.0, 1.2, 9.0)) * 1.5;
+  float rings = length(p.xz + vec2(0.9, 0.35)) * 17.0 + warp;
+  float lines = pow(0.5 + 0.5 * sin(rings * 3.14159), 5.0) * smoothstep(0.25, 0.7, ebFbm(p * vec3(4.0, 0.8, 4.0) + 3.1));
+  float fibers = ebFbm(p * vec3(60.0, 3.0, 60.0));
+  return clamp(lines * 0.65 + fibers * 0.55 - 0.18, 0.0, 1.0);
+}
+`;
+
+material.onBeforeCompile = (shader) => {
+  shader.vertexShader = shader.vertexShader
+    .replace("#include <common>", "#include <common>\nvarying vec3 vObjPos;")
+    .replace("#include <begin_vertex>", "#include <begin_vertex>\nvObjPos = position;");
+  shader.fragmentShader = shader.fragmentShader
+    .replace("#include <common>", `#include <common>\n${EBONY_GLSL}`)
+    .replace(
+      "#include <color_fragment>",
+      `#include <color_fragment>
+      float grain = ebonyGrain(vObjPos);
+      diffuseColor.rgb = mix(vec3(0.009, 0.006, 0.0045), vec3(0.074, 0.045, 0.029), grain);`
+    )
+    .replace("#include <roughnessmap_fragment>", "#include <roughnessmap_fragment>\nroughnessFactor = mix(0.24, 0.44, grain);");
+};
+material.customProgramCacheKey = () => "ebony-v2";
 
 function Logo({ onReady }) {
   const { scene } = useGLTF(MODEL_URL);
