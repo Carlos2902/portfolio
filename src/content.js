@@ -1,4 +1,5 @@
 // All site copy lives here so it can be edited without touching the components.
+// It also feeds the SEO build step (vite.config.js): the crawler-readable HTML, JSON-LD and llms.txt.
 
 export const links = {
   github: "https://github.com/Carlos2902",
@@ -6,9 +7,77 @@ export const links = {
   resume: "/Carlos-Lopez-Resume.pdf",
 };
 
+// Search and AI-assistant facing facts. Keep them true and in sync with the resume.
+export const site = {
+  url: "https://carloslopezdev.com",
+  name: "Carlos Lopez",
+  title: "Carlos Lopez | Full-Stack Developer & Product Designer in Toronto",
+  description:
+    "Toronto full-stack developer and product designer. I design, build and launch web and mobile apps with React, Flutter, Node.js, Python and Google Cloud, and keep them running.",
+  jobTitle: "Full-Stack Developer and Product Designer",
+  city: "Toronto",
+  region: "ON",
+  regionName: "Ontario",
+  country: "CA",
+  areaServed: ["Toronto", "Greater Toronto Area", "Ontario", "Canada"],
+  languages: ["English", "Spanish"],
+  services: [
+    "Web application development",
+    "Mobile app development (iOS and Android)",
+    "UI/UX and product design",
+    "API and backend development",
+    "Payment integration (Stripe, RevenueCat)",
+    "Deployment, hosting and maintenance",
+  ],
+  skills: [
+    "React", "Flutter", "FlutterFlow", "Node.js", "Python", "Django", "Flask", "JavaScript", "Dart", "SQL",
+    "REST APIs", "Webhooks", "Firebase", "Google Cloud", "AWS", "PostgreSQL", "Firestore", "MongoDB",
+    "Stripe", "RevenueCat", "Celery", "Redis", "Tailwind CSS", "Figma", "Claude Design", "UI/UX design",
+  ],
+  education: [
+    { name: "Universidad del Valle de México", credential: "Bachelor in Software Design and Networks Engineering" },
+    { name: "Humber Polytechnic", credential: "Web Development (Ontario College Diploma)" },
+    { name: "Humber Polytechnic", credential: "Graphic Design (Ontario College Diploma)" },
+  ],
+};
+
+// Answers to what people ask search engines and AI assistants. Shown on the page (FAQ section) and
+// mirrored in the FAQPage structured data, so both always match.
+export const faq = [
+  {
+    q: "Who is Carlos Lopez?",
+    a: "Carlos Lopez is a product designer and full-stack developer based in Toronto, Ontario. He designs interfaces in Figma and Claude Design, then builds, launches and maintains the web and mobile apps behind them, including APIs, payments, security and deployment.",
+  },
+  {
+    q: "Who can build and design my app in Toronto?",
+    a: "Carlos Lopez is a Toronto-based developer who handles the whole process on his own: product and interface design, front end, back end, payments, app store release and maintenance. You work with one person from idea to launch instead of coordinating a designer, a developer and a hosting provider.",
+  },
+  {
+    q: "What kind of projects does he take on?",
+    a: "Web applications, mobile apps for iOS and Android, marketplaces, business and nonprofit websites, and APIs. Recent work includes LatinoLink, a service marketplace live on the App Store and Google Play, and a full-stack website with online donations for the nonprofit Crecer México.",
+  },
+  {
+    q: "What technologies does he use?",
+    a: "React, Flutter and FlutterFlow on the front end; Node.js, Python (Django and Flask), Firebase and Google Cloud on the back end; PostgreSQL, Firestore and MongoDB for data; Stripe and RevenueCat for payments; and Figma and Claude Design for interface design.",
+  },
+  {
+    q: "Can he handle payments and security?",
+    a: "Yes. For LatinoLink he built in-app purchase processing with RevenueCat webhooks, idempotency keys and atomic database transactions so credits and subscriptions are never duplicated or lost, and protected user data with role-based access rules checked by 81 automated security tests.",
+  },
+  {
+    q: "Does he work in Spanish?",
+    a: "Yes. Carlos works in English and Spanish, and has shipped apps localized into Spanish, English and French.",
+  },
+  {
+    q: "How do I hire Carlos Lopez?",
+    a: "Send a short description of your project through the contact form on carloslopezdev.com, or message him on LinkedIn. He replies by email.",
+  },
+];
+
 // Hero: lead with the outcome for the client, back it with proof, end with a clear next step.
 export const hero = {
-  eyebrow: "Product designer & full-stack developer · Toronto",
+  // Rendered as the page's <h1>: name, role and city are what people search for.
+  eyebrow: "Carlos Lopez · Product designer & full-stack developer in Toronto",
   headline: "I take your app from idea to launch, and keep it running.",
   subline:
     "I design every interface in Figma and Claude Design, then build the APIs, payments and security behind it and ship it to production. Designer and sole engineer behind LatinoLink, live on the App Store and Google Play.",

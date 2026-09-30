@@ -72,15 +72,16 @@ const Hero = ({ onModelReady }) => {
             className="pointer-events-none absolute -inset-x-16 -inset-y-20 -z-10 bg-[radial-gradient(closest-side,rgb(14_14_13/0.82),rgb(14_14_13/0.55)_55%,transparent)]"
             aria-hidden="true"
           />
-          <p data-hero-fade className="eyebrow mb-6">
+          {/* The <h1> carries what people search for (name, role, city); the big line is the pitch. */}
+          <h1 data-hero-fade className="eyebrow mb-6">
             {hero.eyebrow}
-          </p>
-          <h1
+          </h1>
+          <h2
             data-hero-reveal
             className="font-semibold leading-[1.02] tracking-[-0.045em] text-[clamp(2.4rem,4.2vw,4.4rem)] [text-wrap:balance]"
           >
             {hero.headline}
-          </h1>
+          </h2>
           <p
             data-hero-reveal
             className="mx-auto mt-6 max-w-[34rem] text-[clamp(1rem,1.2vw,1.12rem)] leading-[1.6] text-white/70 [text-wrap:pretty] lg:mx-0"
